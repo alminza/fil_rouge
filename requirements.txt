@@ -1,0 +1,4 @@
+pybase64
+flask
+Pillow==2.2.2
+boto3
