@@ -21,13 +21,16 @@ import PIL
 import json 
 import os
 import csv
-client = boto3.client('s3')
-#client = boto3.client(
-#    's3',
-#    aws_access_key_id=ACCESS_KEY,
-#    aws_secret_access_key=SECRET_KEY,
-#    aws_session_token=SESSION_TOKEN
-#)
+#client = boto3.client('s3')
+client = boto3.client(
+    's3',
+    aws_access_key_id=ACCESS_KEY,
+    aws_secret_access_key=SECRET_KEY,
+    aws_session_token=SESSION_TOKEN
+)
+os.remove(
+                    "./static/jason"
+                            )  # On enlève le fichier qui n'est plus utile
 
 UPLOAD_FOLDER = './static/jason/'
 app = Flask(__name__)
@@ -38,7 +41,7 @@ def upload_files(file_name, bucket, object_name= None, args= None):
         object_name = file_name
     response = client.upload_file(file_name, bucket, object_name, ExtraArgs = args)
     
-@app.route('/depot', methods=['GET', 'POST'])
+@app.route("/depot", methods=['GET', 'POST'])
 def txt_to_json():
     
     if not os.path.isdir(app.config['UPLOAD_FOLDER']): 
@@ -58,7 +61,7 @@ def txt_to_json():
     prepa_extension = os.path.splitext(noms_du_fichier)
     extension = prepa_extension[1]
     
-    if extension == '.jpg':
+    if extension == ".jpg":
         
         data = {}
         with open('./static/jason/' + noms_du_fichier, mode='rb') as file:
