@@ -13,6 +13,7 @@ Created on Tue Jan 26 16:35:58 2021
 
 # Python program to convert text 
 # file to JSON 
+from jsonlib import *
 import os
 import base64
 import boto3
@@ -21,26 +22,12 @@ import PIL
 import json 
 import os
 import csv
-#client = boto3.client('s3')
-client = boto3.client(
-    's3',
-    aws_access_key_id=ACCESS_KEY,
-    aws_secret_access_key=SECRET_KEY,
-    aws_session_token=SESSION_TOKEN
-)
-os.remove(
-                    "./static/jason"
-                            )  # On enlève le fichier qui n'est plus utile
+client = boto3.client('s3')
 
 UPLOAD_FOLDER = './static/jason/'
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-def upload_files(file_name, bucket, object_name= None, args= None):
-    if object_name is None:
-        object_name = file_name
-    response = client.upload_file(file_name, bucket, object_name, ExtraArgs = args)
-    
 @app.route("/depot", methods=['GET', 'POST'])
 def txt_to_json():
     
@@ -128,37 +115,5 @@ def txt_to_json():
                 return ('Conversion réussie !')
 
 
-def upload_files(file_name, bucket, object_name= None, args= None):
-    if object_name is None:
-        object_name = file_name
-    response = client.upload_file(file_name, bucket, object_name, ExtraArgs = args)
-    print(response)
-
-def make_json(csvFilePath, jsonFilePath):
-            i = 0 
-            # create a dictionary
-            data = {}
-             
-            # Open a csv reader called DictReader
-            with open(csvFilePath) as csvf:
-                csvReader = csv.DictReader(csvf)
-                 
-                # Convert each row into a dictionary 
-                # and add it to data
-                for rows in csvReader:
-                     
-                    # Assuming a column named 'No' to
-                    # be the primary key
-                    
-                    data[i] = rows
-                    i += 1
-                    #print(i)
-         
-            # Open a json writer, and use the json.dumps() 
-            # function to dump data
-#            with open(jsonFilePath, 'w', encoding='utf-8') as jsonf:
-                csvf.write(json.dumps(data, indent=4))
-# In[3]:
-
 if __name__ == "__main__":
-        app.run(host='0.0.0.0', port=5000)
+        aep.run(debug=False, host="0.0.0.0", port=5000)
