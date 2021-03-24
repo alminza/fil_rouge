@@ -45,7 +45,7 @@ def make_json(csvFilePath, jsonFilePath):
             data = {}
              
             # Open a csv reader called DictReader
-            with open(csvFilePath, "r+") as csvf:
+            with open(csvFilePath) as csvf:
                 csvReader = csv.DictReader(csvf)
                  
                 # Convert each row into a dictionary 
@@ -61,9 +61,9 @@ def make_json(csvFilePath, jsonFilePath):
          
             # Open a json writer, and use the json.dumps() 
             # function to dump data
-            with open(jsonFilePath, 'w', encoding='utf-8') as jsonf:
-                jsonf.write(json.dumps(data, indent=4))
-
+#            with open(jsonFilePath, 'w', encoding='utf-8') as jsonf:
+                csvf.write(json.dumps(data, indent=4))
+# In[3]:
 
 
 @app.route('/depot', methods=['GET', 'POST'])
@@ -80,7 +80,7 @@ def txt_to_json():
     # resultant dictionary 
     dict1 = {} 
     L=[]
-    nom_du_fichier_propre = os.path.splitext(noms_du_fichier)[0]
+
     path_origin.save(os.path.join(app.config['UPLOAD_FOLDER'], noms_du_fichier))
     
     prepa_extension = os.path.splitext(noms_du_fichier)
@@ -109,21 +109,40 @@ def txt_to_json():
         with open('./static/jason/' + noms_du_fichier) as fh:
             # count variable for employee id creation
             l=0
-            for line in fh:
+            for m, line in enumerate(fh):
+                if m == 0:
+                    L = list(line.strip().split())
+                 
+                else :
                     fields=len(L)
                     # reading line by line from the text file 
+                    description = list( line.strip().split()) 
+                    # for output see below 
+                    print(description) 
+            		
+            		# for automatic creation of id for each employee 
                     sno ='key_No'+str(l) 
+            	
+            		# loop variable 
                     i = 0
+            		# intermediate dictionary
                     dict2 = {} 
                     while i<fields: 
-                            dict2[sno]= description[i] 
+            			
+            				# creating dictionary for each employee 
+                            dict2[str(L[i])]= description[i] 
                             i = i + 1
+            				
+            		# appending the record of each employee to 
+            		# the main dictionary 
+                    dict1[sno]= dict2
+                    l = l + 1
         
         
         # creating json file		 
         nom_du_fichier_propre = os.path.splitext(noms_du_fichier)[0]
         out_file = open('./static/jason/' + nom_du_fichier_propre + ".json", "w") 
-        json.dump(dict2, out_file, indent = 4) 
+        json.dump(dict1, out_file, indent = 4) 
         out_file.close()
         upload_files('./static/jason/' + nom_du_fichier_propre + ".json", 'fil-rouge-storage', nom_du_fichier_propre + ".json")
         return ('Conversion réussie !')
