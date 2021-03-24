@@ -9,8 +9,11 @@ import csv
 
 import json
 
-os.environ['AWS_PROFILE'] = "csloginstudent"                                                                            os.environ['AWS_DEFAULT_REGION'] = "us-east-1"
+#os.environ['AWS_PROFILE'] = "csloginstudent"
+#os.environ['AWS_DEFAULT_REGION'] = "us-east-1"
+
 client = boto3.client('s3')
+
 def upload_files(file_name, bucket, object_name= None, args= None):
     if object_name is None:
         object_name = file_name
