@@ -14,10 +14,11 @@ Created on Tue Jan 26 16:35:58 2021
 # Python program to convert text 
 # file to JSON 
 import os
+from PIL import Image
+from PIL.ExifTags import TAGS
 import base64
 import boto3
 from flask import Flask, request
-import PIL
 import json 
 import os
 import csv
@@ -56,6 +57,8 @@ def pdf_json(path):  # Transforme un fichier PDF en JSON
         page = read_pdf.getPage(p)
         page_content = page.extractText()
         content = texte + page_content + str(metadata)
+
+
     
     return(content)
 
@@ -84,11 +87,17 @@ def csv_json(csvFilePath, jsonFilePath):
                     data[i] = rows
                     i += 1
                     #print(i)
-         
+            with open (csvFilePath) as f:
+                reader = csv.reader(f)
+                headers = next(reader)        # The header row is now consumed
+                ncol = len(headers)
+                nrow = sum(1 for _ in reader) # What remains are the data rows
+                
+                content = reader + headers + ncol + nrow + str(data)
             # Open a json writer, and use the json.dumps() 
             # function to dump data
             with open(jsonFilePath, 'w', encoding='utf-8') as jsonf:
-                jsonf.write(json.dumps(data, indent=4))
+                jsonf.write(json.dumps(content, indent=4))
 
 
 
@@ -119,12 +128,32 @@ def txt_to_json():
             img = file.read()
         pouet = './photo_test.jpg'    
         extension = os.path.splitext(pouet)
-
+        chemin = './static/jason/' + noms_du_fichier
+        # open the image
+        mario = Image.open(chemin, 'r')
+          
+        # extracting the exif metadata
+        exifdata = mario.getexif()
+        # looping through all the tags present in exifdata
+        for tagid in exifdata:
+              
+            # getting the tag name instead of tag id
+            tagname = TAGS.get(tagid, tagid)
+          
+            # passing the tagid to get its respective value
+            value = exifdata.get(tagid)
+            
+            meta_data = {}
+            meta_data[tagname] = value
+            
+        
+        
         print(extension[-1])
         data['file.filename'] = base64.encodebytes(img).decode('utf-8')
+        content = str(data) + str(meta_data)
         nom_du_fichier_propre = os.path.splitext(noms_du_fichier)[0]
         out_file = open('./static/jason/' + nom_du_fichier_propre + ".json", "w") 
-        json.dump(data, out_file, indent = 4) 
+        json.dump(content, out_file, indent = 4) 
         out_file.close()
         upload_files('./static/jason/' + nom_du_fichier_propre + ".json", 'fil-rouge-storage', nom_du_fichier_propre + ".json")
         return ('Conversion réussie !')
