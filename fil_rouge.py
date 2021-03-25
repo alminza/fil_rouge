@@ -33,13 +33,39 @@ UPLOAD_FOLDER = './static/jason/'
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+def pdf_json(path):  # Transforme un fichier PDF en JSON
+
+    fichier = open(path, "rb")
+    try:  # On ouvre le fichier comme un PDF
+        read_pdf = PyPDF2.PdfFileReader(fichier)
+    except:
+        return "Erreur lors de la transformation, etes vous sur que le fichier soit un PDF?"  # Si on arrive pas à l'ouvrir ce n'est pas un PDF
+    Docinfo = read_pdf.getDocumentInfo()  # Extraction des metadonnées du PDF
+    metadata = {
+        "Auteur": Docinfo.author,
+        "Createur": Docinfo.creator,
+        "Sujet": Docinfo.subject,
+        "Titre": Docinfo.title,
+        "MIME": "pdf",
+        "taille": os.path.getsize(path),
+    }
+    number_of_pages = read_pdf.getNumPages()
+    texte = ""
+
+    for p in range(number_of_pages):  # Permet de gérer plusieurs pages
+        page = read_pdf.getPage(p)
+        page_content = page.extractText()
+        content = texte + page_content + str(metadata)
+    
+    return(content)
+
 def upload_files(file_name, bucket, object_name= None, args= None):
     if object_name is None:
         object_name = file_name
     response = client.upload_file(file_name, bucket, object_name, ExtraArgs = args)
     print(response)
 
-def make_json(csvFilePath, jsonFilePath):
+def csv_json(csvFilePath, jsonFilePath):
             i = 0 
             # create a dictionary
             data = {}
@@ -129,9 +155,19 @@ def txt_to_json():
         return ('Conversion réussie !')
 
     if extension == '.csv':
-                make_json('./static/jason/' + noms_du_fichier, './static/jason/' + nom_du_fichier_propre + ".json")
+                csv_json('./static/jason/' + noms_du_fichier, './static/jason/' + nom_du_fichier_propre + ".json")
                 upload_files('./static/jason/' + nom_du_fichier_propre + ".json", 'fil-rouge-storage', nom_du_fichier_propre + ".json")
                 return ('Conversion réussie !')
+    if extension == '.pdf':
+        nom_du_fichier_propre = os.path.splitext(noms_du_fichier)[0]
+        content = pdf_json('./static/jason/' + noms_du_fichier)
+        out_file = open('./static/jason/' + nom_du_fichier_propre + ".json", "w")
+        json.dump(content, out_file, indent = 4)
+        upload_files('./static/jason/' + nom_du_fichier_propre + ".json", 'fil-rouge-storage', nom_du_fichier_propre + ".json")
+        return ('Conversion réussie !')
+        
+        
+
         
 
 
