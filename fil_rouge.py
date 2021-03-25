@@ -122,18 +122,16 @@ def txt_to_json():
     extension = prepa_extension[1]
     
     if extension == '.jpg':
-        
+        meta_data = {}
         data = {}
         with open('./static/jason/' + noms_du_fichier, mode='rb') as file:
             img = file.read()
-        pouet = './photo_test.jpg'    
-        extension = os.path.splitext(pouet)
         chemin = './static/jason/' + noms_du_fichier
         # open the image
-        mario = Image.open(chemin, 'r')
+        with Image.open(chemin, 'r') as mario:
           
         # extracting the exif metadata
-        exifdata = mario.getexif()
+            exifdata = mario.getexif()
         # looping through all the tags present in exifdata
         for tagid in exifdata:
               
@@ -143,7 +141,6 @@ def txt_to_json():
             # passing the tagid to get its respective value
             value = exifdata.get(tagid)
             
-            meta_data = {}
             meta_data[tagname] = value
             
         
