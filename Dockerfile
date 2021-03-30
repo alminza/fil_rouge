@@ -7,7 +7,5 @@ COPY requirements.txt ./
 EXPOSE 5000
 RUN apt update -y && apt install -y python3-pip python-dev
 RUN pip3 install -r ./requirements.txt
-CMD [ "python3","fil_rouge.py"]
-#ENTRYPOINT FLASK_APP=fil_rouge.py flask run
-#CMD rm -rf ./static/jason/*
+CMD ["python3","fil_rouge.py"]
 
