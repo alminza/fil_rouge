@@ -40,8 +40,8 @@ def pdf_json(path, noms_du_fichier):  # Transforme un fichier PDF en JSON
     fichier = open(path, "rb")
     # On ouvre le fichier comme un PDF
     read_pdf = PyPDF2.PdfFileReader(path)
-    #except:
-    #    return "Erreur lors de la transformation, etes vous sur que le fichier soit un PDF?"  # Si on arrive pas à l'ouvrir ce n'est pas un PDF
+    except:
+        return "Erreur lors de la transformation, etes vous sur que le fichier soit un PDF?"  # Si on arrive pas à l'ouvrir ce n'est pas un PDF
     Docinfo = read_pdf.getDocumentInfo()  # Extraction des metadonnées du PDF
     metadata = {
         "Auteur": Docinfo.author,
@@ -103,12 +103,7 @@ def csv_json(csvFilePath, jsonFilePath, noms_du_fichier):
             
             json_csv = json.dumps(data)
             content = (json_csv, metadata)
-            #str(data[0]) + str(ncol) + str(nrow) + str(name) + str(data)    
             return(content)
-            # Open a json writer, and use the json.dumps() 
-            # function to dump data
-            #with open(jsonFilePath, 'w', encoding='utf-8') as jsonf:
-            #    jsonf.write(json.dumps(content, indent=4))
 
 def detect_labels_rekognition(path,):  # Cette fonction permet de demandé à AWS de faire de la reconnaissance d'image
     with open(path, "rb") as f:
@@ -160,10 +155,6 @@ def txt_to_json():
         json_jpg = json.dumps(data)
         content = (json_jpg, meta_data)
         nom_du_fichier_propre = os.path.splitext(noms_du_fichier)[0]
-        #out_file = open('./static/jason/' + nom_du_fichier_propre + ".json", "w") 
-        #json.dump(content, out_file, indent = 4) 
-        #out_file.close()
-        #upload_files('./static/jason/' + nom_du_fichier_propre + ".json", 'fil-rouge-storage', nom_du_fichier_propre + ".json")
         upload_files('./static/jason/' + noms_du_fichier, 'fil-rouge-storage', noms_du_fichier)
         return (content)
 
@@ -196,8 +187,6 @@ def txt_to_json():
 
     if extension == '.csv':
                 content = csv_json('./static/jason/' + noms_du_fichier, './static/jason/' + nom_du_fichier_propre + ".json", noms_du_fichier)
-                
-                #upload_files('./static/jason/' + nom_du_fichier_propre + ".json", 'fil-rouge-storage', nom_du_fichier_propre + ".json")
                 upload_files('./static/jason/' + noms_du_fichier, 'fil-rouge-storage', noms_du_fichier)
                 return (content)
     if extension == '.pdf':
